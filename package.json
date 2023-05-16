@@ -1,11 +1,13 @@
 {
-  "name": "electron-hid-test",
+  "name": "electron-spacemouse-midi",
   "version": "1.0.5",
   "description": "Play with Electron and node-hid",
   "main": "main.js",
   "scripts": {
-    "start": "electron .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "electron-forge start",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "package": "electron-forge package",
+    "make": "electron-forge make"
   },
   "keywords": [
     "hid",
@@ -13,12 +15,21 @@
     "usb",
     "electron"
   ],
-  "author": "Tod Kurt <todbotdotcom@gmail.com> (https://github.com/todbot)",
+  "author": "dave",
   "license": "ISC",
   "devDependencies": {
+    "@electron-forge/cli": "^6.1.1",
+    "@electron-forge/maker-deb": "^6.1.1",
+    "@electron-forge/maker-rpm": "^6.1.1",
+    "@electron-forge/maker-squirrel": "^6.1.1",
+    "@electron-forge/maker-zip": "^6.1.1",
     "electron": "^18.3.15"
   },
   "dependencies": {
-    "node-hid": "^2.1.2"
+    "electron-squirrel-startup": "^1.0.0",
+    "lodash": "^4.17.21",
+    "lodash-es": "^4.17.21",
+    "node-hid": "^2.1.2",
+    "webmidi": "^3.1.5"
   }
 }
