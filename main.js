@@ -94,13 +94,13 @@ function joinInt16(min, maj) {
 // import lodash using require
 let lodash = require('lodash');
 
-const debouncedSendData = lodash.throttle((cc, value, out) => {
-    out.sendControlChange(cc, value, {channels: [1]});
-}, 10);
-
-// const debouncedSendData = (cc, value, out) => {
+// const debouncedSendData = lodash.throttle((cc, value, out) => {
 //     out.sendControlChange(cc, value, {channels: [1]});
-// }
+// }, 3);
+
+const debouncedSendData = (cc, value, out) => {
+    out.sendControlChange(cc, value, {channels: [1]});
+}
 
 useUpdatedMouseData = (data, out) => {
     
@@ -125,7 +125,7 @@ useUpdatedMouseData = (data, out) => {
 
             if (v == null) return;
             if (pv == null) return;
-            if (Math.abs(v - pv) < 0.05) return;
+            if (Math.abs(v - pv) < 0.001) return;
 
             value = Math.floor((v + 1) * 64);
             value = Math.max(0, Math.min(127, value))
@@ -145,7 +145,7 @@ useUpdatedMouseData = (data, out) => {
     rotate.x = null;
 }
 
-const debouncedUpdatedMouseData = lodash.throttle(useUpdatedMouseData, 30);
+const debouncedUpdatedMouseData = lodash.throttle(useUpdatedMouseData, 0);
 // const debouncedUpdatedMouseData = useUpdatedMouseData
 
 
