@@ -1,21 +1,94 @@
 <!DOCTYPE html>
 <html>
-  <head>
+
+<head>
     <meta charset="UTF-8">
     <title>Hello World from electron-hid-test!</title>
     <!-- https://electronjs.org/docs/tutorial/security#csp-meta-tag -->
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
-  </head>
-  <body>
-    <h1>Hello World from electron-hid-test!</h1>
-    We are using node <script>document.write(process.versions.node)</script>,
-    Chrome <script>document.write(process.versions.chrome)</script>,
-    and Electron <script>document.write(process.versions.electron)</script>.
+</head>
 
-    <h1> HID Device list </h1>
-    <pre>
-    <script> </script>
-    </pre>
+<body>
+    <h1>HID Device List (pick the spacemouse)</h1>
+    <button id="refreshHidDevices">Refresh</button>
+    <ul id="hidDevices"></ul>
 
-  </body>
+    <h1>MIDI List</h1>
+    <button id="refreshMidiDevices">Refresh</button>
+    <ul id="midiDevices"></ul>
+    <script>
+        var HID = require('node-hid')
+
+        const { WebMidi } = require("webmidi");
+
+        let midiDevices = []
+        let hidDevices = []
+        let midiDeviceName = "IAC Driver Bus 1";
+
+
+        const refreshMidi = () => {
+            midiOutputs = WebMidi.outputs
+            document.getElementById("midiDevices").innerHTML = ""
+            console.log(midiOutputs)
+
+            midiOutputs.forEach((val, idx) => {
+
+                let li = document.createElement("li");
+                li.innerHTML = val.name;
+
+                let button = document.createElement("button");
+                button.innerHTML = "Connect";
+                button.onclick = () => {
+                    console.log("connecting to " + val.name)
+                    // let device = new HID.HID(val.path);
+                    // device.on("data", (data) => {
+                    //     console.log(data)
+                    // })
+                    // device.on("error", (err) => {
+                    //     console.log(err)
+                    // })
+                }
+                
+                li.appendChild(button);
+                document.getElementById("midiDevices").appendChild(li);
+                button.style.marginLeft = "20px";
+
+            })
+        }
+
+        const refreshHid = () => {
+            hidDevices = HID.devices();
+            document.getElementById("hidDevices").innerHTML = ""
+            console.log(hidDevices)
+            hidDevices.forEach((val, idx) => {
+                document.getElementById("hidDevices").appendChild((() => {
+                    let li = document.createElement("li");
+                    li.innerHTML = val.product;
+                    let button = document.createElement("button");
+                    button.innerHTML = "Connect";
+                    button.onclick = () => {
+                        console.log("connecting to " + val.product)
+                        // let device = new HID.HID(val.path);
+                        // device.on("data", (data) => {
+                        //     console.log(data)
+                        // })
+                        // device.on("error", (err) => {
+                        //     console.log(err)
+                        // })
+                    }
+                    li.appendChild(button);
+                    return li;
+                })())
+            })
+        }
+
+        document.getElementById("refreshHidDevices").addEventListener("click", refreshHid);
+        document.getElementById("refreshMidiDevices").addEventListener("click", refreshMidi);
+
+        refreshHid()
+        refreshMidi()
+    </script>
+
+</body>
+
 </html>

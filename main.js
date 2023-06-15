@@ -11,9 +11,10 @@ var HID = require('node-hid')
 
 const { WebMidi } = require("webmidi");
 
+let midiDevices = []
+let hidDevices = []
+
 let midiDeviceName = "IAC Driver Bus 1";
-
-
 
 if (process.platform === 'linux') {
     app.disableHardwareAcceleration();
@@ -40,8 +41,6 @@ function createWindow() {
     // Open the DevTools.
     win.webContents.openDevTools({ mode: 'bottom' })
 
-
-
     // Emitted when the window is closed.
     win.on('closed', () => {
         // Dereference the window object, usually you would store windows
@@ -66,6 +65,36 @@ app.on('window-all-closed', () => {
     }
 })
 
+const refreshMidi = () => {
+    midiDevices = WebMidi.outputs;
+    console.log(midiDevices)
+    document.getElementById("midiDevices").innerHTML = midiDevices.map(d => "<li>" + d.name + "</li>").join("<br>");
+    document.getElementById("midiDevices").children.forEach((li, i) => {
+        // add button
+        let button = document.createElement("button");
+        button.innerHTML = "Connect";
+        button.onclick = () => {
+            midiDeviceName = midiDevices[i].name;
+        }
+        li.appendChild(button);
+    })
+}
+
+const refreshHid = () => {
+    hidDevices = HID.devices();
+    console.log(hidDevices)
+    document.getElementById("hidDevices").innerHTML = hidDevices.map(d => "<li>" + d.product + "</li>").join("<br>");
+    document.getElementById("hidDevices").children.forEach((li, i) => {
+        // add button
+        let button = document.createElement("button");
+        button.innerHTML = "Connect";
+        button.onclick = () => {
+            midiDeviceName = midiDevices[i].name;
+        }
+        li.appendChild(button);
+    })    
+}
+
 app.on('activate', () => {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
@@ -78,9 +107,6 @@ app.on('activate', () => {
 // code. You can also put them in separate files and require them here.
 
 // console.log("HID devices:", HID.devices().map(d => { return { "p": d.product, "m": d.manufacturer } }));
-
-
-let devices = HID.devices();
 
 function joinInt16(min, maj) {
     var sign = maj & (1 << 7);
@@ -99,16 +125,16 @@ let lodash = require('lodash');
 // }, 3);
 
 const debouncedSendData = (cc, value, out) => {
-    out.sendControlChange(cc, value, {channels: [1]});
+    out.sendControlChange(cc, value, { channels: [1] });
 }
 
 useUpdatedMouseData = (data, out) => {
-    
+
     if (data.rotate.x == null) return;
     if (data.translate.x == null) return;
     // console.log("aaa", data.translate.x)
-    
-    
+
+
     if (out) {
         let listOfStuff = [
             [data.translate.x, prevData.translate.x],
@@ -132,7 +158,7 @@ useUpdatedMouseData = (data, out) => {
             value = Math.floor(value)
             debouncedSendData(70 + i, value, out);
 
-            
+
         });
 
         prevData = {
@@ -147,7 +173,6 @@ useUpdatedMouseData = (data, out) => {
 
 const debouncedUpdatedMouseData = lodash.throttle(useUpdatedMouseData, 0);
 // const debouncedUpdatedMouseData = useUpdatedMouseData
-
 
 
 let translate = { x: null, y: 0, z: 0 };
@@ -201,9 +226,9 @@ const getMouseData = (data, out) => {
 }
 
 WebMidi.enable().then(() => {
-    console.log(WebMidi.outputs)
-
     let midiOutput = null;
+
+    let devices = HID.devices();
 
     WebMidi.outputs.forEach((output) => {
         if (output.name === midiDeviceName) {
@@ -230,4 +255,3 @@ WebMidi.enable().then(() => {
 }).catch((err) => {
     console.log("WebMIDI not enabled", err)
 });
-
